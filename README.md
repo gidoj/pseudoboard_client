@@ -1,2 +1,2 @@
-# pseudoboard
-This is not a physical whiteboard. 
+# pseudoboard_client
+This is not a physical whiteboard. Client side of Pseudoboard.
