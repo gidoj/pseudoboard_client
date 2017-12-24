@@ -30,6 +30,7 @@ public class Tools extends JFrame {
 	public Tools(Board board) {
 		this.board = board;
 		createWindow();
+		
 	}
 	
 	public void showTools() {

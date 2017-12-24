@@ -18,6 +18,7 @@ public class Canvas extends JPanel {
 		w = getWidth();
 		h = getHeight();
 		g.fillRect(0, 0, w, h);
+		
 	}
 
 }

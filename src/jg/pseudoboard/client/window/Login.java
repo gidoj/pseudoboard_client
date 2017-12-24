@@ -31,6 +31,7 @@ public class Login extends JFrame {
 	public Login() {
 		board = new Board();
 		createWindow();
+		
 	}
 	
 	private void createWindow() {

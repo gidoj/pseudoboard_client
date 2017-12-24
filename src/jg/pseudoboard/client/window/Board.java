@@ -28,6 +28,7 @@ public class Board extends JFrame {
 
 	public Board() {
 		createWindow();
+		
 	}
 	
 	public void showBoard() {
