@@ -3,7 +3,10 @@ package jg.pseudoboard.client.window;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -12,7 +15,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JButton;
 
 public class Login extends JFrame {
 
@@ -24,7 +26,10 @@ public class Login extends JFrame {
 	private JTextField txtUsername;
 	private JTextField txtID;
 	
+	private Board board;
+	
 	public Login() {
+		board = new Board();
 		createWindow();
 	}
 	
@@ -38,6 +43,8 @@ public class Login extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(w, h);
 		setLocationRelativeTo(null);
+		setResizable(false);
+		setTitle("Login");
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -78,6 +85,12 @@ public class Login extends JFrame {
 		contentPane.add(chckbxNewUser);
 		
 		JButton btnLogin = new JButton("LOGIN");
+		btnLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+				board.showBoard();
+			}
+		});
 		btnLogin.setBounds(66, 234, 117, 29);
 		contentPane.add(btnLogin);
 	}
