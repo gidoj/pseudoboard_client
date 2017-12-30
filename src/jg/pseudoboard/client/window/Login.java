@@ -59,7 +59,7 @@ public class Login extends JFrame {
 		lblTitle.setBounds(10, 20, 230, 25);
 		contentPane.add(lblTitle);
 		
-		JLabel lblUsername = new JLabel("Username:");
+		JLabel lblUsername = new JLabel("Username (aA-zZ, 0-9):");
 		lblUsername.setFont(new Font("Helvetica", Font.PLAIN, 15));
 		lblUsername.setBounds(10, 57, 171, 16);
 		contentPane.add(lblUsername);

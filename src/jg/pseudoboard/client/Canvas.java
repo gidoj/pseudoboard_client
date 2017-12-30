@@ -20,5 +20,9 @@ public class Canvas extends JPanel {
 		g.fillRect(0, 0, w, h);
 		
 	}
+	
+	public void updateCanvas(Object canvas) {
+		//TODO: repaint canvas with given pixel (array?)
+	}
 
 }
