@@ -42,7 +42,7 @@ public class MessageHandler {
 				return ConnectionStatus.CONNECTION_ERROR;
 			}
 		}
-		String userString = id + ";" + username;
+		String userString = username + ";" + id;
 		int response = -1;
 		if (newUser) comm.send(new MessageElement(userString, MessageTypeConverter.MessageType.LOGIN_NEW_USER));
 		else comm.send(new MessageElement(userString, MessageTypeConverter.MessageType.LOGIN_EXISTING_USER));
@@ -87,12 +87,14 @@ public class MessageHandler {
 	private void handleServerMessage(BoardElement elt) {
 		switch (MessageTypeConverter.getMessageType(elt.getID())) {
 		case LOGIN_SUCCESS:
+			System.out.println("Login successful.");
 			response = 1;
 			waitingForResponse = false;
 			break;
 		case LOGIN_FAIL:
+			System.out.println("Login failed.");
 			response = 0;
-			waitingForResponse = true;
+			waitingForResponse = false;
 			break;
 		default:
 			break;

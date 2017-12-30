@@ -1,20 +1,22 @@
 package jg.pseudoboard.client.window;
 
 import java.awt.BorderLayout;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import jg.pseudoboard.client.Canvas;
-
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import jg.pseudoboard.client.MessageHandler;
 
 public class Board extends JFrame {
 
@@ -25,8 +27,11 @@ public class Board extends JFrame {
 	private Tools tools;
 	
 	private int w = 850, h = 650;
+	
+	private MessageHandler mh;
 
-	public Board() {
+	public Board(MessageHandler mh) {
+		this.mh = mh;
 		createWindow();
 		
 	}
@@ -93,6 +98,13 @@ public class Board extends JFrame {
 		gbl_canvas.columnWeights = new double[]{Double.MIN_VALUE};
 		gbl_canvas.rowWeights = new double[]{Double.MIN_VALUE};
 		canvas.setLayout(gbl_canvas);
+		
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				mh.disconnect(false);
+				System.exit(0);
+			}
+		});
 	}
 
 }

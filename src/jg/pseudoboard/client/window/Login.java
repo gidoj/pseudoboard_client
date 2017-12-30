@@ -10,11 +10,15 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+
+import jg.pseudoboard.client.ConnectionStatus;
+import jg.pseudoboard.client.MessageHandler;
 
 public class Login extends JFrame {
 
@@ -26,12 +30,12 @@ public class Login extends JFrame {
 	private JTextField txtUsername;
 	private JTextField txtID;
 	
-	private Board board;
+	private MessageHandler mh;
+	private static int port = 9365;
 	
 	public Login() {
-		board = new Board();
+		mh = new MessageHandler(port);
 		createWindow();
-		
 	}
 	
 	private void createWindow() {
@@ -69,7 +73,7 @@ public class Login extends JFrame {
 		contentPane.add(txtUsername);
 		txtUsername.setColumns(10);
 		
-		JLabel lblID = new JLabel("ID (5 digits):");
+		JLabel lblID = new JLabel("ID (5 digits, no leading 0):");
 		lblID.setFont(new Font("Helvetica", Font.PLAIN, 15));
 		lblID.setBounds(10, 133, 171, 16);
 		contentPane.add(lblID);
@@ -88,7 +92,41 @@ public class Login extends JFrame {
 		JButton btnLogin = new JButton("LOGIN");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String username = txtUsername.getText();
+				String idString = txtID.getText();
+				if (username.length() == 0 || idString.length() == 0) {
+					JOptionPane.showMessageDialog(contentPane, "Username or ID empty. Please enter required information.", 
+							"Empty Fields!", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (!username.matches("[a-zA-Z0-9]*")) {
+					JOptionPane.showMessageDialog(contentPane, "Username must only include letters and numbers.", 
+												"Invalid Username!", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (idString.length() != 5 || !idString.matches("[0-9]*") || idString.charAt(0) == '0') {
+					JOptionPane.showMessageDialog(contentPane, "ID must be 5 digits long with no leading 0s.", 
+							"Invalid ID!", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				int id = Integer.parseInt(idString);
+				boolean newUser = chckbxNewUser.isSelected();
+				ConnectionStatus status = mh.connect(username, id, newUser);
+				if (newUser) {
+					if (status.equals(ConnectionStatus.LOGIN_FAIL)) {
+						JOptionPane.showMessageDialog(contentPane, "Please try another username.", 
+								"Username already taken!", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+				} else {
+					if (status.equals(ConnectionStatus.LOGIN_FAIL)) {
+						JOptionPane.showMessageDialog(contentPane, "The information provided doesn't match any stored users.\nPlease try again.", 
+								"Incorrect Username/ID!", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+				}
 				setVisible(false);
+				Board board = new Board(mh);
 				board.showBoard();
 			}
 		});
