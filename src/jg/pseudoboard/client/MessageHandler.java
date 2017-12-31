@@ -46,7 +46,7 @@ public class MessageHandler {
 		int response = -1;
 		if (newUser) comm.send(new MessageElement(userString, MessageTypeConverter.MessageType.LOGIN_NEW_USER));
 		else comm.send(new MessageElement(userString, MessageTypeConverter.MessageType.LOGIN_EXISTING_USER));
-		response = checkLogin();
+		response = checkSuccess();
 		if (response == 1) {
 			connected = true;
 			return ConnectionStatus.LOGIN_SUCCESS;
@@ -55,8 +55,8 @@ public class MessageHandler {
 		return ConnectionStatus.LOGIN_FAIL;
 	}
 	
-	private int checkLogin() {
-		//wait for server response on whether login is success or not
+	private int checkSuccess() {
+		//wait for server response on whether action is success or not
 		waitingForResponse = true;
 		while (waitingForResponse) {
 			try {
@@ -76,12 +76,17 @@ public class MessageHandler {
 		case CANVAS:
 			//TODO: update client canvas -- handle if not connected
 			if (connected) {
-				canvas.updateCanvas(elt.getData());
+				canvas.updateCanvas((int[]) elt.getData());
 			}
 			break;
 		default:
 			break;
 		}
+	}
+	
+	public int checkNewCanvas(BoardElement elt) {
+		comm.send(elt);
+		return checkSuccess();
 	}
 	
 	private void handleServerMessage(BoardElement elt) {
@@ -93,6 +98,19 @@ public class MessageHandler {
 			break;
 		case LOGIN_FAIL:
 			System.out.println("Login failed.");
+			response = 0;
+			waitingForResponse = false;
+			break;
+		case NEW_CANVAS:
+			response = 1;
+			String[] canvasInfo = ((String) elt.getData()).split(";");
+			int maxW = Integer.parseInt(canvasInfo[1]);
+			int maxH = Integer.parseInt(canvasInfo[2]);
+			int bg = Integer.parseInt(canvasInfo[3]);
+			canvas.newCanvas(maxW, maxH, bg);
+			waitingForResponse = false;
+			break;
+		case NEW_CANVAS_FAIL:
 			response = 0;
 			waitingForResponse = false;
 			break;

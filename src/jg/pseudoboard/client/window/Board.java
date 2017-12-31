@@ -26,14 +26,17 @@ public class Board extends JFrame {
 	private Canvas canvas;
 	private Tools tools;
 	
+	private NewCanvas newCanvas;
+	
 	private int w = 850, h = 650;
 	
 	private MessageHandler mh;
 
 	public Board(MessageHandler mh) {
 		this.mh = mh;
+		newCanvas = new NewCanvas(mh);
 		createWindow();
-		
+		mh.setCanvas(canvas);
 	}
 	
 	public void showBoard() {
@@ -52,7 +55,7 @@ public class Board extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(w, h);
 		setLocationRelativeTo(null);
-		setTitle("PseudoBoard (ID: 01234)");
+		setTitle("PseudoBoard");
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -61,6 +64,13 @@ public class Board extends JFrame {
 		menuBar.add(mnFile);
 		
 		JMenuItem mntmNew = new JMenuItem("New");
+		mntmNew.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				newCanvas.setLocationRelativeTo(null);
+				newCanvas.resetWindow();
+				newCanvas.setVisible(true);
+			}
+		});
 		mnFile.add(mntmNew);
 		
 		JMenuItem mntmOpen = new JMenuItem("Open");
