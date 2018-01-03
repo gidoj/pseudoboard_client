@@ -32,10 +32,13 @@ public class Canvas extends JPanel {
 			return;
 		}
 		
-		for (int y = offy; y < offy+h; y++) {
-			for (int x = offx; x < offx+w; x++) {
-				int rgb = pixelArray[y*w + x];
+		window = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		
+		for (int y = offy; y < offy+Math.min(h, maxH); y++) {
+			for (int x = offx; x < offx+Math.min(w, maxW); x++) {
+				int rgb = pixelArray[y*Math.min(w, maxW) + x];
 				if (rgb == -1) rgb = bg;//any instance of -1 represents background
+				if (rgb == -2) rgb = Math.abs(bg - 0xFFFFFF);
 				window.setRGB(x-offx, y-offy, rgb);
 			}
 		}
@@ -59,14 +62,22 @@ public class Canvas extends JPanel {
 		size = maxW * maxH;
 		
 		//set offset so that window initially sees center of canvas
-		offx = maxW/2 - w/2;
-		offy = maxH/2 - h/2;
+		offx = 0;//maxW/2 - w/2;
+		offy = 0;//maxH/2 - h/2;
 		
 		//initiallize canvas pixel array
 		pixelArray = new int[size];
 		for (int i = 0; i < size; i++) {
 			pixelArray[i] = -1;
 		}
+		
+		//messing around with checkerboard idea
+		/*for (int y = 0; y < maxH; y++) {
+			for (int x = 0; x < maxW; x++) {
+				if (y % 20 < 10)  pixelArray[y*maxW + x] = -1;
+				else pixelArray[y*maxW + x] = -2;
+			}
+		}*/
 		
 		//initialize buffered image
 		window = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
@@ -79,6 +90,11 @@ public class Canvas extends JPanel {
 		for (int i = 0; i < size; i++) {
 			pixelArray[i] = canvas[i];
 		}
+		repaint();
+	}
+	
+	public void clearCanvas() {
+		noCanvas = true;
 		repaint();
 	}
 	

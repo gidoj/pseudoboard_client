@@ -17,6 +17,8 @@ import javax.swing.border.EmptyBorder;
 
 import jg.pseudoboard.client.Canvas;
 import jg.pseudoboard.client.MessageHandler;
+import jg.pseudoboard.common.MessageElement;
+import jg.pseudoboard.common.MessageTypeConverter.MessageType;
 
 public class Board extends JFrame {
 
@@ -27,6 +29,7 @@ public class Board extends JFrame {
 	private Tools tools;
 	
 	private NewCanvas newCanvas;
+	private OpenCanvas openCanvas;
 	
 	private int w = 850, h = 650;
 	
@@ -35,6 +38,7 @@ public class Board extends JFrame {
 	public Board(MessageHandler mh) {
 		this.mh = mh;
 		newCanvas = new NewCanvas(mh);
+		openCanvas = new OpenCanvas(mh);
 		createWindow();
 		mh.setCanvas(canvas);
 	}
@@ -43,6 +47,27 @@ public class Board extends JFrame {
 		setVisible(true);
 		tools = new Tools(this);
 		tools.setVisible(true);
+	}
+	
+	private void showNewCanvas() {
+		newCanvas.setLocationRelativeTo(null);
+		newCanvas.resetWindow();
+		newCanvas.setVisible(true);
+	}
+	
+	private void saveCanvas() {
+		mh.sendData(new MessageElement("", MessageType.SAVE_CANVAS));
+	}
+	
+	private void showOpenCanvas() {
+		if (openCanvas.isVisible()) return;
+		openCanvas.setCanvasList();
+		openCanvas.setLocationRelativeTo(null);
+		openCanvas.setVisible(true);
+	}
+	
+	private void showShareCanvas() {
+		
 	}
 	
 	private void createWindow() {
@@ -66,18 +91,34 @@ public class Board extends JFrame {
 		JMenuItem mntmNew = new JMenuItem("New");
 		mntmNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				newCanvas.setLocationRelativeTo(null);
-				newCanvas.resetWindow();
-				newCanvas.setVisible(true);
+				showNewCanvas();
 			}
 		});
 		mnFile.add(mntmNew);
 		
 		JMenuItem mntmOpen = new JMenuItem("Open");
+		mntmOpen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showOpenCanvas();
+			}
+		});
 		mnFile.add(mntmOpen);
 		
 		JMenuItem mntmSave = new JMenuItem("Save");
+		mntmSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				saveCanvas();
+			}
+		});
 		mnFile.add(mntmSave);
+		
+		JMenuItem mntmShare = new JMenuItem("Share");
+		mntmShare.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showShareCanvas();
+			}
+		});
+		mnFile.add(mntmShare);
 		
 		JMenuItem mntmQuit = new JMenuItem("Quit");
 		mnFile.add(mntmQuit);

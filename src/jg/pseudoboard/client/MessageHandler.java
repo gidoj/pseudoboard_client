@@ -3,6 +3,7 @@ package jg.pseudoboard.client;
 import jg.pseudoboard.common.BoardElement;
 import jg.pseudoboard.common.MessageElement;
 import jg.pseudoboard.common.MessageTypeConverter;
+import jg.pseudoboard.common.MessageTypeConverter.MessageType;
 
 public class MessageHandler {
 	
@@ -20,6 +21,8 @@ public class MessageHandler {
 	
 	private volatile boolean waitingForResponse;
 	private volatile int response;
+	
+	private String objectList;
 	
 	public MessageHandler(int port) {
 		this.port = port;
@@ -89,6 +92,16 @@ public class MessageHandler {
 		return checkSuccess();
 	}
 	
+	public String[] getCanvasList() {
+		comm.send(new MessageElement("", MessageType.CANVAS_LIST));
+		checkSuccess();
+		return objectList.split(";");
+	}
+	
+	public void sendData(BoardElement elt) {
+		comm.send(elt);
+	}
+	
 	private void handleServerMessage(BoardElement elt) {
 		switch (MessageTypeConverter.getMessageType(elt.getID())) {
 		case LOGIN_SUCCESS:
@@ -113,6 +126,25 @@ public class MessageHandler {
 		case NEW_CANVAS_FAIL:
 			response = 0;
 			waitingForResponse = false;
+			break;
+		case CANVAS_LIST:
+			objectList = (String) elt.getData();
+			waitingForResponse = false;
+			break;
+		case OPEN_CANVAS:
+			String canvasString = (String) elt.getData();
+			String[] rawArray = canvasString.split(";");
+			int width = Integer.parseInt(rawArray[1]);
+			int height = Integer.parseInt(rawArray[2]);
+			bg = Integer.parseInt(rawArray[3]);
+			
+			String[] imageStrings = rawArray[4].split(",");
+			int[] openedCanvas = new int[width*height];
+			for (int i = 0; i < width*height; i++) {
+				openedCanvas[i] = Integer.parseInt(imageStrings[i]);
+			}
+			canvas.newCanvas(width, height, bg);
+			canvas.updateCanvas(openedCanvas);
 			break;
 		default:
 			break;

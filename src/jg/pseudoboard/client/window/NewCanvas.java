@@ -46,6 +46,7 @@ public class NewCanvas extends JFrame {
 		setSize(w, h);
 		setLocationRelativeTo(null);
 		setResizable(false);
+		setAlwaysOnTop(true);
 		setTitle("New Canvas");
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -66,7 +67,7 @@ public class NewCanvas extends JFrame {
 		contentPane.add(lblWidth);
 		
 		txtWidth = new JTextField();
-		txtWidth.setText("20000");
+		txtWidth.setText("1500");
 		txtWidth.setBounds(6, 104, 82, 26);
 		contentPane.add(txtWidth);
 		txtWidth.setColumns(10);
@@ -76,7 +77,7 @@ public class NewCanvas extends JFrame {
 		contentPane.add(lblHeightpx);
 		
 		txtHeight = new JTextField();
-		txtHeight.setText("20000");
+		txtHeight.setText("1500");
 		txtHeight.setBounds(100, 104, 82, 26);
 		contentPane.add(txtHeight);
 		txtHeight.setColumns(10);
@@ -315,8 +316,8 @@ public class NewCanvas extends JFrame {
 	
 	public void resetWindow() {
 		txtName.setText("");
-		txtWidth.setText("20000");
-		txtHeight.setText("20000");
+		txtWidth.setText("1500");
+		txtHeight.setText("1500");
 		red = 255;
 		green = 255;
 		blue = 255;
