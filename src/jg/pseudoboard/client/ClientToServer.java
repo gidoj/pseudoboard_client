@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import jg.pseudoboard.common.BoardElement;
 
@@ -43,13 +42,11 @@ public class ClientToServer implements Runnable {
 			in = new ObjectInputStream(socket.getInputStream());
 			running = true;
 			listen();
-		} catch (UnknownHostException e) {
-			System.out.println("Error connecting to server.");
+		} catch (Exception e) {
+			System.out.println("Error connecting to server.\n");
 			e.printStackTrace();
-		} catch (IOException e) {
-			System.out.println("Error connecting to server.");
-			e.printStackTrace();
-		}
+			mh.serverDown = true;
+		} 
 	}
 	
 	public void listen() {
@@ -85,7 +82,8 @@ public class ClientToServer implements Runnable {
 					out.writeObject(elt);
 				} catch (IOException e) {
 					System.out.println("Error sending element to server.");
-					e.printStackTrace();
+					System.out.println("Exiting.");
+					System.exit(0);
 				}
 			}
 		};

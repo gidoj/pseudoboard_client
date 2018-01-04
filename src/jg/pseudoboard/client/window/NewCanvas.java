@@ -297,6 +297,13 @@ public class NewCanvas extends JFrame {
 							"Invalid heigth/width!", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				
+				if (Integer.parseInt(widthString) > 3000 || Integer.parseInt(heightString) > 3000) {
+					JOptionPane.showMessageDialog(contentPane, "Height and width cannot exceed 3000.", 
+							"Height/Width too big!", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
 				int color = (red << 16) | (green << 8) | blue;
 				String canvasString = canvasName + ";" + widthString + ";" + heightString + ";" + color;
 				int response = mh.checkNewCanvas(new MessageElement(canvasString, MessageType.NEW_CANVAS));

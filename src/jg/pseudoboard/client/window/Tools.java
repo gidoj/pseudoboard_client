@@ -1,6 +1,8 @@
 package jg.pseudoboard.client.window;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -12,6 +14,9 @@ import javax.swing.JSlider;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
+
+import jg.pseudoboard.client.ToolType;
+
 import javax.swing.event.ChangeEvent;
 
 public class Tools extends JFrame {
@@ -19,6 +24,7 @@ public class Tools extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private JPanel contentPane;
+	private JCheckBox chckbxFillShape;
 	
 	private int w = 150, h = 590;
 	
@@ -26,6 +32,8 @@ public class Tools extends JFrame {
 	
 	private JPanel colorView;
 	private int red = 0, green = 0, blue = 0;
+	
+	private ToolType tool = ToolType.BRUSH;
 
 	public Tools(Board board) {
 		this.board = board;
@@ -56,6 +64,11 @@ public class Tools extends JFrame {
 		contentPane.setLayout(null);
 		
 		JSlider sliderSize = new JSlider();
+		sliderSize.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				board.changeBrushSize(sliderSize.getValue());
+			}
+		});
 		sliderSize.setValue(5);
 		sliderSize.setMaximum(20);
 		sliderSize.setMinimum(1);
@@ -63,47 +76,101 @@ public class Tools extends JFrame {
 		contentPane.add(sliderSize);
 		
 		JRadioButton rdbtnLine = new JRadioButton("Line (L)");
+		rdbtnLine.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tool = ToolType.LINE;
+				board.changeTool(tool, chckbxFillShape.isSelected());
+			}
+		});
 		rdbtnLine.setFocusPainted(false);
 		rdbtnLine.setBounds(6, 6, 141, 23);
 		contentPane.add(rdbtnLine);
 		
 		JRadioButton rdbtnArrow = new JRadioButton("Arrow (A)");
+		rdbtnArrow.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tool = ToolType.ARROW;
+				board.changeTool(tool, chckbxFillShape.isSelected());
+			}
+		});
 		rdbtnArrow.setFocusPainted(false);
 		rdbtnArrow.setBounds(6, 36, 141, 23);
 		contentPane.add(rdbtnArrow);
 		
 		JRadioButton rdbtnBrush = new JRadioButton("Brush (B)");
+		rdbtnBrush.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tool = ToolType.BRUSH;
+				board.changeTool(tool, chckbxFillShape.isSelected());
+			}
+		});
 		rdbtnBrush.setSelected(true);
 		rdbtnBrush.setFocusPainted(false);
 		rdbtnBrush.setBounds(6, 66, 141, 23);
 		contentPane.add(rdbtnBrush);
 		
 		JRadioButton rdbtnCircle = new JRadioButton("Circle (C)");
+		rdbtnCircle.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tool = ToolType.BRUSH;
+				board.changeTool(tool, chckbxFillShape.isSelected());
+			}
+		});
 		rdbtnCircle.setFocusPainted(false);
 		rdbtnCircle.setBounds(6, 96, 141, 23);
 		contentPane.add(rdbtnCircle);
 		
 		JRadioButton rdbtnRectangle = new JRadioButton("Rectangle (R)");
+		rdbtnRectangle.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tool = ToolType.RECTANGLE;
+				board.changeTool(tool, chckbxFillShape.isSelected());
+			}
+		});
 		rdbtnRectangle.setFocusPainted(false);
 		rdbtnRectangle.setBounds(6, 126, 141, 23);
 		contentPane.add(rdbtnRectangle);
 		
 		JRadioButton rdbtnTriangle = new JRadioButton("Triangle (T)");
+		rdbtnTriangle.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tool = ToolType.TRIANGLE;
+				board.changeTool(tool, chckbxFillShape.isSelected());
+			}
+		});
 		rdbtnTriangle.setFocusPainted(false);
 		rdbtnTriangle.setBounds(6, 156, 141, 23);
 		contentPane.add(rdbtnTriangle);
 		
 		JRadioButton rdbtnEraser = new JRadioButton("Eraser (E)");
+		rdbtnEraser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tool = ToolType.ERASER;
+				board.changeTool(tool, chckbxFillShape.isSelected());
+			}
+		});
 		rdbtnEraser.setFocusPainted(false);
 		rdbtnEraser.setBounds(6, 186, 141, 23);
 		contentPane.add(rdbtnEraser);
 		
 		JRadioButton rdbtnSelect = new JRadioButton("Select (S)");
+		rdbtnSelect.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tool = ToolType.SELECT;
+				board.changeTool(tool, chckbxFillShape.isSelected());
+			}
+		});
 		rdbtnSelect.setFocusPainted(false);
 		rdbtnSelect.setBounds(6, 216, 141, 23);
 		contentPane.add(rdbtnSelect);
 		
 		JRadioButton rdbtnDrag = new JRadioButton("Drag (D)");
+		rdbtnDrag.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tool = ToolType.DRAG;
+				board.changeTool(tool, chckbxFillShape.isSelected());
+			}
+		});
 		rdbtnDrag.setFocusPainted(false);
 		rdbtnDrag.setBounds(6, 246, 141, 23);
 		contentPane.add(rdbtnDrag);
@@ -119,7 +186,12 @@ public class Tools extends JFrame {
 		group.add(rdbtnSelect);
 		group.add(rdbtnDrag);
 		
-		JCheckBox chckbxFillShape = new JCheckBox("Fill Shape");
+		chckbxFillShape = new JCheckBox("Fill Shape");
+		chckbxFillShape.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				board.changeTool(tool, chckbxFillShape.isSelected());
+			}
+		});
 		chckbxFillShape.setFocusPainted(false);
 		chckbxFillShape.setBounds(6, 276, 128, 23);
 		contentPane.add(chckbxFillShape);
@@ -142,6 +214,7 @@ public class Tools extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				red = sliderRed.getValue();
 				colorView.setBackground(new Color(red, green, blue));
+				board.changeBrushColor((red << 16) | (green << 8) | blue); 
 			}
 		});
 		sliderRed.setValue(0);
@@ -154,6 +227,7 @@ public class Tools extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				green = sliderGreen.getValue();
 				colorView.setBackground(new Color(red, green, blue));
+				board.changeBrushColor((red << 16) | (green << 8) | blue);
 			}
 		});
 		sliderGreen.setValue(0);
@@ -166,6 +240,7 @@ public class Tools extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				blue = sliderBlue.getValue();
 				colorView.setBackground(new Color(red, green, blue));
+				board.changeBrushColor((red << 16) | (green << 8) | blue);
 			}
 		});
 		sliderBlue.setValue(0);

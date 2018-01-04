@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -11,12 +14,15 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import jg.pseudoboard.client.Canvas;
 import jg.pseudoboard.client.MessageHandler;
+import jg.pseudoboard.client.ToolType;
+import jg.pseudoboard.common.GraphicElement;
 import jg.pseudoboard.common.MessageElement;
 import jg.pseudoboard.common.MessageTypeConverter.MessageType;
 
@@ -30,6 +36,7 @@ public class Board extends JFrame {
 	
 	private NewCanvas newCanvas;
 	private OpenCanvas openCanvas;
+	private ShareCanvas shareCanvas;
 	
 	private int w = 850, h = 650;
 	
@@ -39,8 +46,22 @@ public class Board extends JFrame {
 		this.mh = mh;
 		newCanvas = new NewCanvas(mh);
 		openCanvas = new OpenCanvas(mh);
+		shareCanvas = new ShareCanvas(mh);
 		createWindow();
 		mh.setCanvas(canvas);
+	}
+	
+	public void changeTool(ToolType t, boolean fillShape) {
+		canvas.tool = t;
+		canvas.fillShape = fillShape;
+	}
+	
+	public void changeBrushSize(int brushSize) {
+		canvas.brushSize = brushSize;
+	}
+	
+	public void changeBrushColor(int brushColor) {
+		canvas.brushColor = brushColor;
 	}
 	
 	public void showBoard() {
@@ -67,7 +88,10 @@ public class Board extends JFrame {
 	}
 	
 	private void showShareCanvas() {
-		
+		if (shareCanvas.isVisible()) return;
+		shareCanvas.setUserList();
+		shareCanvas.setLocationRelativeTo(null);
+		shareCanvas.setVisible(true);
 	}
 	
 	private void createWindow() {
@@ -107,6 +131,11 @@ public class Board extends JFrame {
 		JMenuItem mntmSave = new JMenuItem("Save");
 		mntmSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (canvas.noCanvas) {
+					JOptionPane.showMessageDialog(contentPane, "No canvas is currently open that can be saved.", 
+							"No canvas!", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				saveCanvas();
 			}
 		});
@@ -115,6 +144,11 @@ public class Board extends JFrame {
 		JMenuItem mntmShare = new JMenuItem("Share");
 		mntmShare.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (canvas.noCanvas) {
+					JOptionPane.showMessageDialog(contentPane, "No canvas is currently open that can be shared.", 
+							"No canvas!", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				showShareCanvas();
 			}
 		});
@@ -149,6 +183,41 @@ public class Board extends JFrame {
 		gbl_canvas.columnWeights = new double[]{Double.MIN_VALUE};
 		gbl_canvas.rowWeights = new double[]{Double.MIN_VALUE};
 		canvas.setLayout(gbl_canvas);
+		
+		canvas.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (canvas.noCanvas) return;
+				canvas.finishDraw();
+				mh.sendData(new GraphicElement(canvas.minX, canvas.minY, canvas.maxX, canvas.maxY, canvas.graphicArray));
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (canvas.noCanvas) return;
+				canvas.setInitialPoint(e.getX(), e.getY());
+			}
+			
+			public void mouseExited(MouseEvent e) {
+			}
+			public void mouseEntered(MouseEvent e) {	
+			}
+			public void mouseClicked(MouseEvent e) {
+			}
+		});
+		
+		canvas.addMouseMotionListener(new MouseMotionListener() {
+
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				if (canvas.noCanvas) return;
+				canvas.drawNewPoint(e.getX(), e.getY());
+			}
+			
+			public void mouseMoved(MouseEvent e) {
+			}
+		});
 		
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {

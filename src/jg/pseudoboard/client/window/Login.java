@@ -31,7 +31,7 @@ public class Login extends JFrame {
 	private JTextField txtID;
 	
 	private MessageHandler mh;
-	private static int port = 9365;
+	private static int port = 21898;
 	
 	public Login() {
 		mh = new MessageHandler(port);
@@ -112,6 +112,11 @@ public class Login extends JFrame {
 				int id = Integer.parseInt(idString);
 				boolean newUser = chckbxNewUser.isSelected();
 				ConnectionStatus status = mh.connect(username, id, newUser);
+				if (status.equals(ConnectionStatus.SERVER_DOWN)) {
+					JOptionPane.showMessageDialog(contentPane, "If you want to use this program,\ngo bother Joe to start the server.", 
+							"Server Down!", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				if (newUser) {
 					if (status.equals(ConnectionStatus.LOGIN_FAIL)) {
 						JOptionPane.showMessageDialog(contentPane, "Please try another username.", 
