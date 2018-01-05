@@ -78,7 +78,7 @@ public class Canvas extends JPanel {
 		
 		if (xcurr + ycurr >= 0 && !tool.equals(ToolType.DRAG)) {
 			//if want coninuous brush stroke get rid of if statement - always new graphic
-			if (tool != ToolType.BRUSH) graphic = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+			if (tool != ToolType.BRUSH && tool != ToolType.ERASER) graphic = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 			Graphics gg = graphic.getGraphics();
 			gg.setColor(new Color(brushColor | 0xFF000000));
 			
@@ -88,6 +88,10 @@ public class Canvas extends JPanel {
 			switch (tool) {
 			case ARROW:
 				break;
+			case ERASER:
+				//simple eraser tool -- server just sees this as brush with bg brush color
+				//--will make server see eraser as background value later
+				gg.setColor(new Color(bg | 0xFF000000));
 			case BRUSH:
 				int stepSize = 1;
 				int dx = xcurr - x0;
@@ -114,8 +118,6 @@ public class Canvas extends JPanel {
 				int oh = Math.abs(y0-ycurr);
 				if (fillShape) g2.fillOval(ox1, oy1, ow, oh);
 				else g2.drawOval(ox1, oy1, ow, oh);
-				break;
-			case ERASER:
 				break;
 			case LINE:
 				g2.drawLine(x0, y0, xcurr, ycurr);
