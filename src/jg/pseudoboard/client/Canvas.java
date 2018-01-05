@@ -77,7 +77,8 @@ public class Canvas extends JPanel {
 		g.drawImage(window, 0, 0, w, h, null);
 		
 		if (xcurr + ycurr >= 0 && !tool.equals(ToolType.DRAG)) {
-			graphic = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+			//if want coninuous brush stroke get rid of if statement - always new graphic
+			if (tool != ToolType.BRUSH) graphic = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 			Graphics gg = graphic.getGraphics();
 			gg.setColor(new Color(brushColor | 0xFF000000));
 			
@@ -145,8 +146,9 @@ public class Canvas extends JPanel {
 			g.drawImage(graphic, 0, 0, w, h, null);
 			
 			if (tool == ToolType.BRUSH) {
-				board.sendCanvasUpdate(false);
-				setInitialPoint(xcurr, ycurr);
+				//uncomment for continuous brush stroke
+				//board.sendCanvasUpdate(false);
+				//setInitialPoint(xcurr, ycurr);
 			}
 		}
 		

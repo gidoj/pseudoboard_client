@@ -47,8 +47,6 @@ public class Board extends JFrame {
 	private MessageHandler mh;
 	
 	public ToolType prevTool = ToolType.BRUSH;
-	
-	private boolean metaDown = false;
 
 	public Board(MessageHandler mh) {
 		this.mh = mh;
@@ -160,7 +158,7 @@ public class Board extends JFrame {
 				saveCanvas();
 			}
 		});
-		mntmSave.setAccelerator(KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask()));
+		//mntmSave.setAccelerator(KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask()));
 		mnFile.add(mntmSave);
 		
 		JMenuItem mntmShare = new JMenuItem("Share");
@@ -174,7 +172,7 @@ public class Board extends JFrame {
 				showShareCanvas();
 			}
 		});
-		mntmShare.setAccelerator(KeyStroke.getKeyStroke('R', Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask()));
+		mntmShare.setAccelerator(KeyStroke.getKeyStroke('W', Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask()));
 		mnFile.add(mntmShare);
 		
 		JMenuItem mntmQuit = new JMenuItem("Quit");
@@ -196,7 +194,6 @@ public class Board extends JFrame {
 				tools.showTools();
 			}
 		});
-		mntmToolPane.setAccelerator(KeyStroke.getKeyStroke('T', Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask()));
 		mnView.add(mntmToolPane);
 		
 		JMenu mnTools = new JMenu("Tools");
@@ -396,8 +393,6 @@ public class Board extends JFrame {
 			
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_META) {metaDown = false; return;}
-				if (metaDown || e.isControlDown()) return;
 				switch (e.getKeyCode()) {
 				case KeyEvent.VK_SPACE:
 					canvas.tool = prevTool;
@@ -476,9 +471,6 @@ public class Board extends JFrame {
 				switch (e.getKeyCode()) {
 				case KeyEvent.VK_SPACE:
 					canvas.tool = ToolType.DRAG;
-					break;
-				case KeyEvent.VK_META:
-					metaDown = true;
 					break;
 				default:
 					break;
