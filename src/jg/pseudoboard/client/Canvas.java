@@ -123,24 +123,12 @@ public class Canvas extends JPanel {
 			case SQUARE:
 			case RECTANGLE:
 				int x1 = x0, y1 = y0;
-				if (xcurr < x0) x1 = xcurr;
-				if (ycurr < y0) y1 = ycurr;
-				int rw, rh;
-				if (fillShape) {
-					rw = Math.abs(x0-xcurr);
-					rh = Math.abs(y0-ycurr);
-					rw = tool == ToolType.SQUARE ? Math.min(rw, rh) : rw;
-					rh = tool == ToolType.SQUARE ? Math.min(rw, rh) : rh;
-					gg.fillRect(x1, y1, rw, rh);
-				} else {
-					for (int i = 0; i < brushSize; i++) {
-						rw = Math.abs(x0-xcurr)-2*i;
-						rh = Math.abs(y0-ycurr)-2*i;
-						rw = tool == ToolType.SQUARE ? Math.min(rw, rh) : rw;
-						rh = tool == ToolType.SQUARE ? Math.min(rw, rh) : rh;
-						gg.drawRect(x1+i, y1+i, rw, rh);
-					}
-				}
+				int rw = Math.abs(x0-xcurr);
+				int rh = tool == ToolType.SQUARE ? rw : Math.abs(y0-ycurr);			
+				if (xcurr < x0) x1 = tool == ToolType.SQUARE ? x0 - rw : xcurr;
+				if (ycurr < y0) y1 = tool == ToolType.SQUARE ? y0 - rh : ycurr;
+				if (fillShape) g2.fillRect(x1, y1, rw, rh);
+				else g2.drawRect(x1, y1, rw, rh);
 				break;
 			case SELECT:
 				break;
