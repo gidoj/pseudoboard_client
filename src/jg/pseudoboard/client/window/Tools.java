@@ -84,7 +84,7 @@ public class Tools extends JFrame {
 		case BRUSH:
 			rdbtnBrush.setSelected(select);
 			break;
-		case CIRCLE:
+		case OVAL:
 			rdbtnCircle.setSelected(select);
 			break;
 		case DRAG:
@@ -185,7 +185,7 @@ public class Tools extends JFrame {
 		rdbtnCircle = new JRadioButton("Circle (C)");
 		rdbtnCircle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				tool = ToolType.CIRCLE;
+				tool = ToolType.OVAL;
 				board.changeTool(tool, chckbxFillShape.isSelected());
 			}
 		});

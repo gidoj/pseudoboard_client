@@ -33,6 +33,7 @@ public class Canvas extends JPanel {
 	public int brushColor = 0x000000;
 	
 	private int x0 = -1, y0 = -1, xcurr = -1, ycurr = -1;
+	private int xCirMin, yCirMin,xCirMax, yCirMax, r;
 	
 	public int minX, maxX, minY, maxY;
 	public int[] graphicArray;
@@ -103,14 +104,25 @@ public class Canvas extends JPanel {
 				}
 				break;
 			case CIRCLE:
-				double a = Math.pow((Math.abs(xcurr - x0)), 2);
-				double b = Math.pow((Math.abs(ycurr - y0)), 2);
-				double length = Math.sqrt(a+b);
-				int r = (int) Math.sqrt((Math.pow(length,2))/2)/2;
-				int x = x0 - (r/2);
-				int y = y0 - (r/2);
-				//System.out.print("r= " + r + " x= " + x + " y= " + y);
-				gg.fillOval(x, y, r, r);
+			case OVAL:
+				double a = Math.pow((Math.abs(xcurr - x0)), 2); //width squared
+				double b = Math.pow((Math.abs(ycurr - y0)), 2); //height squared
+				//double length = Math.sqrt(a+b); //diagonal length across rectangle
+				int cirWidth = (int) Math.sqrt(a);
+				int cirHeight = (int) Math.sqrt(b);
+				int x = x0 - cirHeight/2;
+				int y = y0 - cirWidth/2;
+				xCirMin = x; //top left x point in rect
+				yCirMin = y; //top left y point in rect
+				xCirMax = x + cirWidth; //bottom right x point in rect
+				yCirMax = y + cirHeight; //bottom right y point in rect
+				gg.setColor(Color.RED);
+				gg.drawLine(xCirMax, yCirMax, xCirMax, yCirMax);
+				gg.drawLine(x, y, x, y);
+				gg.drawLine(x0, y0, x0, y0);
+				gg.setColor(Color.BLACK);
+				if(fillShape) gg.fillOval(x, y, cirWidth, cirHeight);
+				else gg.drawOval(x, y, cirWidth, cirHeight);
 				break;
 			case ERASER:
 				break;
@@ -119,15 +131,25 @@ public class Canvas extends JPanel {
 				g2.setStroke(new BasicStroke(brushSize));
 				g2.drawLine(x0, y0, xcurr, ycurr);
 				break;
+			case SQUARE:
 			case RECTANGLE:
 				int x1 = x0, y1 = y0;
 				if (xcurr < x0) x1 = xcurr;
 				if (ycurr < y0) y1 = ycurr;
+				int rw, rh;
 				if (fillShape) {
-					gg.fillRect(x1, y1, Math.abs(x0-xcurr), Math.abs(y0-ycurr));
+					rw = Math.abs(x0-xcurr);
+					rh = Math.abs(y0-ycurr);
+					rw = tool == ToolType.SQUARE ? Math.min(rw, rh) : rw;
+					rh = tool == ToolType.SQUARE ? Math.min(rw, rh) : rh;
+					gg.fillRect(x1, y1, rw, rh);
 				} else {
 					for (int i = 0; i < brushSize; i++) {
-						gg.drawRect(x1+i, y1+i, Math.abs(x0-xcurr)-2*i, Math.abs(y0-ycurr)-2*i);
+						rw = Math.abs(x0-xcurr)-2*i;
+						rh = Math.abs(y0-ycurr)-2*i;
+						rw = tool == ToolType.SQUARE ? Math.min(rw, rh) : rw;
+						rh = tool == ToolType.SQUARE ? Math.min(rw, rh) : rh;
+						gg.drawRect(x1+i, y1+i, rw, rh);
 					}
 				}
 				break;
@@ -236,10 +258,17 @@ public class Canvas extends JPanel {
 	}
 	
 	public void finishDraw() {
-		minX = (minX - brushSize) < 0 ? 0 : minX - brushSize;
-		minY = (minY - brushSize) < 0 ? 0 : minY - brushSize;
-		maxX = (maxX + brushSize) >= maxW ? maxW-1 : maxX + brushSize;
-		maxY = (maxY + brushSize) >= maxH ? maxH-1 : maxY + brushSize;
+		if(tool!= ToolType.CIRCLE) {
+			minX = (minX - brushSize) < 0 ? 0 : minX - brushSize;
+			minY = (minY - brushSize) < 0 ? 0 : minY - brushSize;
+			maxX = (maxX + brushSize) >= maxW ? maxW-1 : maxX + brushSize;
+			maxY = (maxY + brushSize) >= maxH ? maxH-1 : maxY + brushSize;
+		}else {
+			minX = xCirMin;
+			minY = yCirMin;
+			maxX = xCirMax;
+			maxY = yCirMax;
+		}
 		int graphicWidth = maxX - minX + 1;
 		int graphicHeight = maxY - minY + 1;
 		int graphicSize = graphicWidth * graphicHeight;

@@ -218,7 +218,7 @@ public class Board extends JFrame {
 		JMenuItem mntmCircle = new JMenuItem("(C) Circle");
 		mntmCircle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateTool(ToolType.CIRCLE);
+				updateTool(ToolType.OVAL);
 			}
 		});
 		mnTools.add(mntmCircle);
@@ -395,6 +395,7 @@ public class Board extends JFrame {
 			public void keyReleased(KeyEvent e) {
 				switch (e.getKeyCode()) {
 				case KeyEvent.VK_SPACE:
+				case KeyEvent.VK_SHIFT:
 					canvas.tool = prevTool;
 					break;
 				case KeyEvent.VK_OPEN_BRACKET:
@@ -413,7 +414,7 @@ public class Board extends JFrame {
 					updateTool(ToolType.BRUSH);
 					break;
 				case KeyEvent.VK_C:
-					updateTool(ToolType.CIRCLE);
+					updateTool(ToolType.OVAL);
 					break;
 				case KeyEvent.VK_R:
 					updateTool(ToolType.RECTANGLE);
@@ -471,6 +472,18 @@ public class Board extends JFrame {
 				switch (e.getKeyCode()) {
 				case KeyEvent.VK_SPACE:
 					canvas.tool = ToolType.DRAG;
+					break;
+				case KeyEvent.VK_SHIFT:
+					switch (prevTool) {
+					case OVAL:
+						canvas.tool = ToolType.CIRCLE;
+						break;
+					case RECTANGLE:
+						canvas.tool = ToolType.SQUARE;
+						break;
+					default:
+						break;
+					}
 					break;
 				default:
 					break;
