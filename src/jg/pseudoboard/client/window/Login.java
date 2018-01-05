@@ -31,7 +31,7 @@ public class Login extends JFrame {
 	private JTextField txtID;
 	
 	private MessageHandler mh;
-	private static int port = 21899;//CHANGE: 21898
+	private static int port = 21898;
 	
 	public Login() {
 		mh = new MessageHandler(port);
