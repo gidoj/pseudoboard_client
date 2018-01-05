@@ -33,7 +33,6 @@ public class Canvas extends JPanel {
 	public int brushColor = 0x000000;
 	
 	private int x0 = -1, y0 = -1, xcurr = -1, ycurr = -1;
-	private int xCirMin, yCirMin,xCirMax, yCirMax, r;
 	
 	public int minX, maxX, minY, maxY;
 	public int[] graphicArray;
@@ -83,6 +82,9 @@ public class Canvas extends JPanel {
 			Graphics gg = graphic.getGraphics();
 			gg.setColor(new Color(brushColor | 0xFF000000));
 			
+			Graphics2D g2 = (Graphics2D) gg;
+			g2.setStroke(new BasicStroke(brushSize));
+			
 			switch (tool) {
 			case ARROW:
 				break;
@@ -105,30 +107,17 @@ public class Canvas extends JPanel {
 				break;
 			case CIRCLE:
 			case OVAL:
-				double a = Math.pow((Math.abs(xcurr - x0)), 2); //width squared
-				double b = Math.pow((Math.abs(ycurr - y0)), 2); //height squared
-				//double length = Math.sqrt(a+b); //diagonal length across rectangle
-				int cirWidth = (int) Math.sqrt(a);
-				int cirHeight = (int) Math.sqrt(b);
-				int x = x0 - cirHeight/2;
-				int y = y0 - cirWidth/2;
-				xCirMin = x; //top left x point in rect
-				yCirMin = y; //top left y point in rect
-				xCirMax = x + cirWidth; //bottom right x point in rect
-				yCirMax = y + cirHeight; //bottom right y point in rect
-				gg.setColor(Color.RED);
-				gg.drawLine(xCirMax, yCirMax, xCirMax, yCirMax);
-				gg.drawLine(x, y, x, y);
-				gg.drawLine(x0, y0, x0, y0);
-				gg.setColor(Color.BLACK);
-				if(fillShape) gg.fillOval(x, y, cirWidth, cirHeight);
-				else gg.drawOval(x, y, cirWidth, cirHeight);
+				int ox1 = x0, oy1 = y0;
+				if (xcurr < x0) ox1 = xcurr;
+				if (ycurr < y0) oy1 = ycurr;
+				int ow = Math.abs(x0-xcurr);
+				int oh = Math.abs(y0-ycurr);
+				if (fillShape) g2.fillOval(ox1, oy1, ow, oh);
+				else g2.drawOval(ox1, oy1, ow, oh);
 				break;
 			case ERASER:
 				break;
 			case LINE:
-				Graphics2D g2 = (Graphics2D) gg;
-				g2.setStroke(new BasicStroke(brushSize));
 				g2.drawLine(x0, y0, xcurr, ycurr);
 				break;
 			case SQUARE:
@@ -258,17 +247,10 @@ public class Canvas extends JPanel {
 	}
 	
 	public void finishDraw() {
-		if(tool!= ToolType.CIRCLE) {
-			minX = (minX - brushSize) < 0 ? 0 : minX - brushSize;
-			minY = (minY - brushSize) < 0 ? 0 : minY - brushSize;
-			maxX = (maxX + brushSize) >= maxW ? maxW-1 : maxX + brushSize;
-			maxY = (maxY + brushSize) >= maxH ? maxH-1 : maxY + brushSize;
-		}else {
-			minX = xCirMin;
-			minY = yCirMin;
-			maxX = xCirMax;
-			maxY = yCirMax;
-		}
+		minX = (minX - brushSize) < 0 ? 0 : minX - brushSize;
+		minY = (minY - brushSize) < 0 ? 0 : minY - brushSize;
+		maxX = (maxX + brushSize) >= maxW ? maxW-1 : maxX + brushSize;
+		maxY = (maxY + brushSize) >= maxH ? maxH-1 : maxY + brushSize;
 		int graphicWidth = maxX - minX + 1;
 		int graphicHeight = maxY - minY + 1;
 		int graphicSize = graphicWidth * graphicHeight;
