@@ -25,6 +25,17 @@ public class Tools extends JFrame {
 	
 	private JPanel contentPane;
 	private JCheckBox chckbxFillShape;
+	private JSlider sliderSize;
+	
+	private JRadioButton rdbtnLine;
+	private JRadioButton rdbtnArrow;
+	private JRadioButton rdbtnBrush;
+	private JRadioButton rdbtnCircle;
+	private JRadioButton rdbtnRectangle;
+	private JRadioButton rdbtnTriangle;
+	private JRadioButton rdbtnEraser;
+	private JRadioButton rdbtnSelect;
+	private JRadioButton rdbtnDrag;
 	
 	private int w = 150, h = 590;
 	
@@ -46,6 +57,68 @@ public class Tools extends JFrame {
 		setVisible(true);
 	}
 	
+	public void changeBrushSize(int i) {
+		int newSize = Math.min(Math.max(sliderSize.getValue()+i, 1), sliderSize.getMaximum());
+		sliderSize.setValue(newSize);
+	}
+	
+	public void setTool(ToolType t) {
+		selectTool(tool, false);
+		selectTool(t, true);
+		tool = t;
+	}
+	
+	public boolean fillShape() {
+		return chckbxFillShape.isSelected();
+	}
+	
+	public void setFillShape(boolean fill) {
+		chckbxFillShape.setSelected(fill);
+	}
+	
+	private void selectTool(ToolType t, boolean select) {
+		switch (t) {
+		case ARROW:
+			rdbtnArrow.setSelected(select);
+			break;
+		case BRUSH:
+			rdbtnBrush.setSelected(select);
+			break;
+		case CIRCLE:
+			rdbtnCircle.setSelected(select);
+			break;
+		case DRAG:
+			rdbtnDrag.setSelected(select);
+			break;
+		case ERASER:
+			rdbtnEraser.setSelected(select);
+			break;
+		case LINE:
+			rdbtnLine.setSelected(select);
+			break;
+		case RECTANGLE:
+			rdbtnRectangle.setSelected(select);
+			break;
+		case SELECT:
+			rdbtnSelect.setSelected(select);
+			break;
+		case TRIANGLE:
+			rdbtnTriangle.setSelected(select);
+			break;
+		default:
+			break;
+		
+		}
+	}
+	
+	public void setColor(int red, int green, int blue) {
+		this.red = red;
+		this.green = green;
+		this.blue = blue;
+		colorView.setBackground(new Color(red, green, blue));
+		board.changeBrushColor((red << 16) | (green << 8) | blue);
+	}
+	
 	private void createWindow() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -63,7 +136,7 @@ public class Tools extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JSlider sliderSize = new JSlider();
+		sliderSize = new JSlider();
 		sliderSize.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				board.changeBrushSize(sliderSize.getValue());
@@ -75,7 +148,7 @@ public class Tools extends JFrame {
 		sliderSize.setBounds(6, 334, 133, 29);
 		contentPane.add(sliderSize);
 		
-		JRadioButton rdbtnLine = new JRadioButton("Line (L)");
+		rdbtnLine = new JRadioButton("Line (L)");
 		rdbtnLine.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tool = ToolType.LINE;
@@ -86,7 +159,7 @@ public class Tools extends JFrame {
 		rdbtnLine.setBounds(6, 6, 141, 23);
 		contentPane.add(rdbtnLine);
 		
-		JRadioButton rdbtnArrow = new JRadioButton("Arrow (A)");
+		rdbtnArrow = new JRadioButton("Arrow (A)");
 		rdbtnArrow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tool = ToolType.ARROW;
@@ -97,7 +170,7 @@ public class Tools extends JFrame {
 		rdbtnArrow.setBounds(6, 36, 141, 23);
 		contentPane.add(rdbtnArrow);
 		
-		JRadioButton rdbtnBrush = new JRadioButton("Brush (B)");
+		rdbtnBrush = new JRadioButton("Brush (B)");
 		rdbtnBrush.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tool = ToolType.BRUSH;
@@ -109,10 +182,10 @@ public class Tools extends JFrame {
 		rdbtnBrush.setBounds(6, 66, 141, 23);
 		contentPane.add(rdbtnBrush);
 		
-		JRadioButton rdbtnCircle = new JRadioButton("Circle (C)");
+		rdbtnCircle = new JRadioButton("Circle (C)");
 		rdbtnCircle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				tool = ToolType.BRUSH;
+				tool = ToolType.CIRCLE;
 				board.changeTool(tool, chckbxFillShape.isSelected());
 			}
 		});
@@ -120,7 +193,7 @@ public class Tools extends JFrame {
 		rdbtnCircle.setBounds(6, 96, 141, 23);
 		contentPane.add(rdbtnCircle);
 		
-		JRadioButton rdbtnRectangle = new JRadioButton("Rectangle (R)");
+		rdbtnRectangle = new JRadioButton("Rectangle (R)");
 		rdbtnRectangle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tool = ToolType.RECTANGLE;
@@ -131,7 +204,7 @@ public class Tools extends JFrame {
 		rdbtnRectangle.setBounds(6, 126, 141, 23);
 		contentPane.add(rdbtnRectangle);
 		
-		JRadioButton rdbtnTriangle = new JRadioButton("Triangle (T)");
+		rdbtnTriangle = new JRadioButton("Triangle (T)");
 		rdbtnTriangle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tool = ToolType.TRIANGLE;
@@ -142,7 +215,7 @@ public class Tools extends JFrame {
 		rdbtnTriangle.setBounds(6, 156, 141, 23);
 		contentPane.add(rdbtnTriangle);
 		
-		JRadioButton rdbtnEraser = new JRadioButton("Eraser (E)");
+		rdbtnEraser = new JRadioButton("Eraser (E)");
 		rdbtnEraser.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tool = ToolType.ERASER;
@@ -153,7 +226,7 @@ public class Tools extends JFrame {
 		rdbtnEraser.setBounds(6, 186, 141, 23);
 		contentPane.add(rdbtnEraser);
 		
-		JRadioButton rdbtnSelect = new JRadioButton("Select (S)");
+		rdbtnSelect = new JRadioButton("Select (S)");
 		rdbtnSelect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tool = ToolType.SELECT;
@@ -164,7 +237,7 @@ public class Tools extends JFrame {
 		rdbtnSelect.setBounds(6, 216, 141, 23);
 		contentPane.add(rdbtnSelect);
 		
-		JRadioButton rdbtnDrag = new JRadioButton("Drag (D)");
+		rdbtnDrag = new JRadioButton("Drag (D)");
 		rdbtnDrag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tool = ToolType.DRAG;
@@ -186,7 +259,7 @@ public class Tools extends JFrame {
 		group.add(rdbtnSelect);
 		group.add(rdbtnDrag);
 		
-		chckbxFillShape = new JCheckBox("Fill Shape");
+		chckbxFillShape = new JCheckBox("Fill Shape (F)");
 		chckbxFillShape.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				board.changeTool(tool, chckbxFillShape.isSelected());

@@ -1,18 +1,24 @@
 package jg.pseudoboard.client;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
+import jg.pseudoboard.client.window.Board;
+
 public class Canvas extends JPanel {
 	
-	private int w, h, maxW, maxH; // w, h relate to window; maxW, maxH relate to canvas
-	private int offx, offy;
-	private int size; // maxW*maxH
-
 	private static final long serialVersionUID = 1L;
+	
+	private Board board;
+
+	private int w, h, maxW, maxH; // w, h relate to window; maxW, maxH relate to canvas
+	private int size; // maxW*maxH
+	public int offx, offy;
 	
 	public boolean noCanvas = true;
 	
@@ -32,6 +38,10 @@ public class Canvas extends JPanel {
 	public int[] graphicArray;
 	private BufferedImage graphic;
 	
+	public Canvas(Board board) {
+		this.board = board;
+	}
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		w = getWidth();
@@ -46,6 +56,15 @@ public class Canvas extends JPanel {
 		g.setColor(new Color(bg));
 		g.fillRect(0, 0, w, h);
 		
+		if (tool.equals(ToolType.DRAG) && xcurr+ycurr >= 0) {
+			offx -= xcurr - x0;
+			offy -= ycurr - y0;
+			offx = Math.min(Math.max(offx, 0), Math.abs(maxW-w-1));
+			offy = Math.min(Math.max(offy, 0), Math.abs(maxH-h-1));
+			x0 = xcurr;
+			y0 = ycurr;
+		}
+		
 		window = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		
 		for (int y = offy; y < offy+Math.min(h, maxH); y++) {
@@ -57,7 +76,7 @@ public class Canvas extends JPanel {
 		
 		g.drawImage(window, 0, 0, w, h, null);
 		
-		if (xcurr + ycurr >= 0) {
+		if (xcurr + ycurr >= 0 && !tool.equals(ToolType.DRAG)) {
 			graphic = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 			Graphics gg = graphic.getGraphics();
 			gg.setColor(new Color(brushColor | 0xFF000000));
@@ -66,14 +85,38 @@ public class Canvas extends JPanel {
 			case ARROW:
 				break;
 			case BRUSH:
+				int stepSize = 1;
+				int dx = xcurr - x0;
+				int dy = ycurr - y0;
+				int xs = dx == 0 ? 0 : stepSize * dx/Math.abs(dx);
+				int ys = dy == 0 ? 0 : stepSize * dy/Math.abs(dy);
+				int mSize = brushSize+1;
+				while (dx!=0 || dy!=0) {
+					int cx = x0 - mSize/2;
+					int cy = y0 - mSize/2;
+					gg.fillOval(cx, cy, mSize, mSize);
+					dx = xcurr-x0;
+					dy = ycurr-y0;					
+					x0 = dx == 0 ? x0 : x0+xs;
+					y0 = dy == 0 ? y0 : y0+ys;
+				}
 				break;
 			case CIRCLE:
-				break;
-			case DRAG:
+				double a = Math.pow((Math.abs(xcurr - x0)), 2);
+				double b = Math.pow((Math.abs(ycurr - y0)), 2);
+				double length = Math.sqrt(a+b);
+				int r = (int) Math.sqrt((Math.pow(length,2))/2)/2;
+				int x = x0 - (r/2);
+				int y = y0 - (r/2);
+				//System.out.print("r= " + r + " x= " + x + " y= " + y);
+				gg.fillOval(x, y, r, r);
 				break;
 			case ERASER:
 				break;
 			case LINE:
+				Graphics2D g2 = (Graphics2D) gg;
+				g2.setStroke(new BasicStroke(brushSize));
+				g2.drawLine(x0, y0, xcurr, ycurr);
 				break;
 			case RECTANGLE:
 				int x1 = x0, y1 = y0;
@@ -100,6 +143,11 @@ public class Canvas extends JPanel {
 			if (ycurr < minY) minY = ycurr;
 			else if (ycurr > maxY) maxY = ycurr;
 			g.drawImage(graphic, 0, 0, w, h, null);
+			
+			if (tool == ToolType.BRUSH) {
+				board.sendCanvasUpdate(false);
+				setInitialPoint(xcurr, ycurr);
+			}
 		}
 		
 	}
@@ -126,8 +174,8 @@ public class Canvas extends JPanel {
 		pixelArray = new int[size];
 		
 		//initialize buffered image
-		window = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-		
+		window = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		graphic = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		//update display
 		repaint();
 	}
@@ -141,16 +189,12 @@ public class Canvas extends JPanel {
 	}
 	
 	public void updateCanvasSection(int[] canvas) {
-		//TODO: what if get canvas update from another user
-		//      but this client currently drawing something?
-		//		will mess current drawing up - find solution
-		resetGraphic();//temp fix - will clear whatever user currently drawing
-		minX = canvas[0];
-		minY = canvas[1];
-		maxX = canvas[2];
-		maxY = canvas[3];
-		int graphicWidth = maxX - minX + 1;
-		int graphicHeight = maxY - minY + 1;
+		int gminX = canvas[0];
+		int gminY = canvas[1];
+		int gmaxX = canvas[2];
+		int gmaxY = canvas[3];
+		int graphicWidth = gmaxX - gminX + 1;
+		int graphicHeight = gmaxY - gminY + 1;
 		int graphicSize = graphicWidth * graphicHeight;
 		graphicArray = new int[graphicSize];
 		for (int y = 0; y < graphicHeight; y++) {
@@ -158,7 +202,7 @@ public class Canvas extends JPanel {
 				int updateVal = canvas[y*graphicWidth + x + 4];
 				if (updateVal == 0) continue;
 				graphicArray[y*graphicWidth + x] = updateVal;
-				pixelArray[(y+minY)*maxW + (x+minX)] = updateVal;
+				pixelArray[(y+gminY)*maxW + (x+gminX)] = updateVal;
 			}
 		}
 		repaint();
@@ -189,18 +233,22 @@ public class Canvas extends JPanel {
 		repaint();
 	}
 	
-	public void finishDraw() {	
+	public void finishDraw() {
+		minX = (minX - brushSize) < 0 ? 0 : minX - brushSize;
+		minY = (minY - brushSize) < 0 ? 0 : minY - brushSize;
+		maxX = (maxX + brushSize) >= maxW ? maxW-1 : maxX + brushSize;
+		maxY = (maxY + brushSize) >= maxH ? maxH-1 : maxY + brushSize;
 		int graphicWidth = maxX - minX + 1;
 		int graphicHeight = maxY - minY + 1;
 		int graphicSize = graphicWidth * graphicHeight;
 		graphicArray = new int[graphicSize];
 		for (int y = 0; y < graphicHeight; y++) {
 			for (int x = 0; x < graphicWidth; x++) {
+				if (x+minX < 0 || x+minX >= w || y+minY < 0 || y+minY >= h) continue;
 				int argb = graphic.getRGB(x+minX, y+minY);
 				graphicArray[y * graphicWidth + x] = argb;
 			}
 		}
-		resetGraphic();
 	}
 	
 	public void resetGraphic() {
