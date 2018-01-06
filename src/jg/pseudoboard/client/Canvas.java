@@ -14,7 +14,7 @@ public class Canvas extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private Board board;
+	//private Board board; //for continuous brush use
 
 	private int w, h, maxW, maxH; // w, h relate to window; maxW, maxH relate to canvas
 	private int size; // maxW*maxH
@@ -39,7 +39,7 @@ public class Canvas extends JPanel {
 	private BufferedImage graphic;
 	
 	public Canvas(Board board) {
-		this.board = board;
+		//this.board = board;
 	}
 	
 	@Override
@@ -77,7 +77,7 @@ public class Canvas extends JPanel {
 		g.drawImage(window, 0, 0, w, h, null);
 		
 		if (xcurr + ycurr >= 0 && !tool.equals(ToolType.DRAG)) {
-			//if want coninuous brush stroke get rid of if statement - always new graphic
+			//if want continuous brush stroke get rid of if statement - always new graphic
 			if (tool != ToolType.BRUSH && tool != ToolType.ERASER) graphic = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 			Graphics gg = graphic.getGraphics();
 			gg.setColor(new Color(brushColor | 0xFF000000));
@@ -109,28 +109,32 @@ public class Canvas extends JPanel {
 					y0 = dy == 0 ? y0 : y0+ys;
 				}
 				break;
+			case SQUARE:
+			case RECTANGLE:
 			case CIRCLE:
 			case OVAL:
-				int ox1 = x0, oy1 = y0;
-				if (xcurr < x0) ox1 = xcurr;
-				if (ycurr < y0) oy1 = ycurr;
-				int ow = Math.abs(x0-xcurr);
-				int oh = Math.abs(y0-ycurr);
-				if (fillShape) g2.fillOval(ox1, oy1, ow, oh);
-				else g2.drawOval(ox1, oy1, ow, oh);
+				int x1 = x0, y1 = y0;
+				int rw = Math.abs(x0-xcurr);
+				int rh = tool == ToolType.SQUARE || tool == ToolType.CIRCLE ? rw : Math.abs(y0-ycurr);			
+				if (xcurr < x0) x1 = tool == ToolType.SQUARE || tool == ToolType.CIRCLE ? x0 - rw : xcurr;
+				if (ycurr < y0) y1 = tool == ToolType.SQUARE || tool == ToolType.CIRCLE ? y0 - rh : ycurr;
+				if (fillShape) {
+					if (tool == ToolType.SQUARE || tool == ToolType.RECTANGLE) g2.fillRect(x1, y1, rw, rh);
+					else g2.fillOval(x1, y1, rw, rh);
+				}
+				else {
+					if (tool == ToolType.SQUARE || tool == ToolType.RECTANGLE) g2.drawRect(x1, y1, rw, rh);
+					else g2.drawOval(x1, y1, rw, rh);
+				}
+				break;
+			case RIGID_LINE:
+				int lx, ly;
+				if (Math.abs(x0-xcurr) > Math.abs(y0-ycurr)) { lx=xcurr; ly=y0; }
+				else { lx=x0; ly=ycurr; }
+				g2.drawLine(x0, y0, lx, ly);
 				break;
 			case LINE:
 				g2.drawLine(x0, y0, xcurr, ycurr);
-				break;
-			case SQUARE:
-			case RECTANGLE:
-				int x1 = x0, y1 = y0;
-				int rw = Math.abs(x0-xcurr);
-				int rh = tool == ToolType.SQUARE ? rw : Math.abs(y0-ycurr);			
-				if (xcurr < x0) x1 = tool == ToolType.SQUARE ? x0 - rw : xcurr;
-				if (ycurr < y0) y1 = tool == ToolType.SQUARE ? y0 - rh : ycurr;
-				if (fillShape) g2.fillRect(x1, y1, rw, rh);
-				else g2.drawRect(x1, y1, rw, rh);
 				break;
 			case SELECT:
 				break;

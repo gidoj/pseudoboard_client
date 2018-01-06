@@ -481,6 +481,9 @@ public class Board extends JFrame {
 					case RECTANGLE:
 						canvas.tool = ToolType.SQUARE;
 						break;
+					case LINE:
+						canvas.tool = ToolType.RIGID_LINE;
+						break;
 					default:
 						break;
 					}
