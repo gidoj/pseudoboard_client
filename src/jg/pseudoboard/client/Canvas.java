@@ -5,9 +5,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
+import java.awt.Font;
 import jg.pseudoboard.client.window.Board;
 
 public class Canvas extends JPanel {
@@ -29,6 +32,7 @@ public class Canvas extends JPanel {
 	
 	public ToolType tool = ToolType.BRUSH;
 	public boolean fillShape = false;
+	public boolean dashed = false;
 	public int brushSize = 5;
 	public int brushColor = 0x000000;
 	
@@ -38,8 +42,12 @@ public class Canvas extends JPanel {
 	public int[] graphicArray;
 	private BufferedImage graphic;
 	
+	private List<StringBuilder> textLines;
+	private int fontSize = 15;
+	
 	public Canvas(Board board) {
 		//this.board = board;
+		textLines = new ArrayList<StringBuilder>();
 	}
 	
 	@Override
@@ -83,7 +91,8 @@ public class Canvas extends JPanel {
 			gg.setColor(new Color(brushColor | 0xFF000000));
 			
 			Graphics2D g2 = (Graphics2D) gg;
-			g2.setStroke(new BasicStroke(brushSize));
+			if (dashed) g2.setStroke(new BasicStroke(brushSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0));
+			else g2.setStroke(new BasicStroke(brushSize));
 			
 			switch (tool) {
 			case ARROW:
@@ -126,6 +135,7 @@ public class Canvas extends JPanel {
 					if (tool == ToolType.SQUARE || tool == ToolType.RECTANGLE) g2.drawRect(x1, y1, rw, rh);
 					else g2.drawOval(x1, y1, rw, rh);
 				}
+				if (tool == ToolType.SQUARE || tool == ToolType.CIRCLE) ycurr = ycurr < y0 ? y0 - rw : y0 + rw;
 				break;
 			case RIGID_LINE:
 				int lx, ly;
@@ -136,9 +146,16 @@ public class Canvas extends JPanel {
 			case LINE:
 				g2.drawLine(x0, y0, xcurr, ycurr);
 				break;
-			case SELECT:
-				break;
 			case TRIANGLE:
+				break;
+			case TEXT:
+				g.setColor(new Color(brushColor));
+				g2.setFont(new Font("Arial", Font.PLAIN, brushSize+7));
+				fontSize = brushSize + 10;
+				if (textLines.size() == 0) g.fillRect(x0, y0, 1, fontSize);
+				for (int i = 0; i < textLines.size(); i++) {
+					g2.drawString(textLines.get(i).toString(), x0, y0 + (i+1)*fontSize);
+				}
 				break;
 			default:
 				break;
@@ -227,6 +244,7 @@ public class Canvas extends JPanel {
 		minY =y0;
 		maxX = x0;
 		maxY = y0;
+		if (tool == ToolType.TEXT) {xcurr = x0; ycurr = y0;}
 		
 	}
 	
@@ -258,12 +276,28 @@ public class Canvas extends JPanel {
 		}
 	}
 	
+	public void addToString(String c, boolean addLine, boolean delete) {
+		if (textLines.size() == 0) textLines.add(new StringBuilder());
+		StringBuilder last = textLines.get(textLines.size() - 1);
+		StringBuilder line;
+		if (delete) line = last.length() > 0 ? last.deleteCharAt(last.length()-1) : last;
+		else {
+			line = addLine ? new StringBuilder() : last.append(c);
+			if (addLine) textLines.add(line);
+			if (line.length() * fontSize/2 > xcurr-x0) xcurr = x0 + line.length()*fontSize/2;
+			ycurr = textLines.size() * fontSize + y0 + 10;
+		}
+		repaint();
+		
+	}
+	
 	public void resetGraphic() {
 		x0 = -1;
 		y0 = -1;
 		xcurr = -1;
 		ycurr = -1;
 		graphic = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);//clear graphic image
+		textLines.clear();//reset text 
 	}
 	
 	

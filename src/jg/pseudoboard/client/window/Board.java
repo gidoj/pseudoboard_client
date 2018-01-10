@@ -46,7 +46,8 @@ public class Board extends JFrame {
 	
 	private MessageHandler mh;
 	
-	public ToolType prevTool = ToolType.BRUSH;
+	private ToolType prevTool = ToolType.BRUSH;
+	private boolean typing= false;
 
 	public Board(MessageHandler mh) {
 		this.mh = mh;
@@ -158,7 +159,7 @@ public class Board extends JFrame {
 				saveCanvas();
 			}
 		});
-		//mntmSave.setAccelerator(KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask()));
+		mntmSave.setAccelerator(KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask()));
 		mnFile.add(mntmSave);
 		
 		JMenuItem mntmShare = new JMenuItem("Share");
@@ -255,10 +256,10 @@ public class Board extends JFrame {
 		});
 		mnTools.add(mntmRectangle);
 		
-		JMenuItem mntmSelect = new JMenuItem("(S) Select");
+		JMenuItem mntmSelect = new JMenuItem("(T) Text");
 		mntmSelect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateTool(ToolType.SELECT);
+				updateTool(ToolType.TEXT);
 			}
 		});
 		mnTools.add(mntmSelect);
@@ -356,11 +357,18 @@ public class Board extends JFrame {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (canvas.noCanvas) return;
-				sendCanvasUpdate(true);
+				
+				if (prevTool == ToolType.TEXT) {
+					typing = !typing;
+					if (typing) {canvas.setInitialPoint(e.getX(), e.getY()); canvas.repaint();}
+				}
+					
+				if (!typing) sendCanvasUpdate(true);
 			}
 			
 			@Override
 			public void mousePressed(MouseEvent e) {
+				if (typing) return;
 				if (canvas.noCanvas) return;
 				canvas.setInitialPoint(e.getX(), e.getY());
 			}
@@ -393,6 +401,14 @@ public class Board extends JFrame {
 			
 			@Override
 			public void keyReleased(KeyEvent e) {
+				if (typing) {
+					if (e.getKeyCode() == KeyEvent.VK_SHIFT) return;
+					boolean addLine = e.getKeyCode() == KeyEvent.VK_ENTER;
+					boolean delete = e.getKeyCode() == KeyEvent.VK_BACK_SPACE;
+					String c = Character.toString(e.getKeyChar());
+					canvas.addToString(c, addLine, delete);
+					return;
+				}
 				switch (e.getKeyCode()) {
 				case KeyEvent.VK_SPACE:
 				case KeyEvent.VK_SHIFT:
@@ -425,11 +441,11 @@ public class Board extends JFrame {
 				case KeyEvent.VK_E:
 					updateTool(ToolType.ERASER);
 					break;
-				case KeyEvent.VK_S:
-					updateTool(ToolType.SELECT);
-					break;
 				case KeyEvent.VK_D:
 					updateTool(ToolType.DRAG);
+					break;
+				case KeyEvent.VK_P:
+					updateTool(ToolType.TEXT);
 					break;
 				case KeyEvent.VK_F:
 					tools.setFillShape(!tools.fillShape());
@@ -462,6 +478,9 @@ public class Board extends JFrame {
 				case KeyEvent.VK_9:
 					tools.setColor(0, 255, 255);
 					break;
+				case KeyEvent.VK_MINUS:
+					canvas.dashed = !canvas.dashed;
+					break;
 				default:
 					break;
 				}
@@ -469,6 +488,7 @@ public class Board extends JFrame {
 			
 			@Override
 			public void keyPressed(KeyEvent e) {
+				if (prevTool == ToolType.TEXT) return;
 				switch (e.getKeyCode()) {
 				case KeyEvent.VK_SPACE:
 					canvas.tool = ToolType.DRAG;

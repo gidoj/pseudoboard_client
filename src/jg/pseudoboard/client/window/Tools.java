@@ -34,7 +34,7 @@ public class Tools extends JFrame {
 	private JRadioButton rdbtnRectangle;
 	private JRadioButton rdbtnTriangle;
 	private JRadioButton rdbtnEraser;
-	private JRadioButton rdbtnSelect;
+	private JRadioButton rdbtnText;
 	private JRadioButton rdbtnDrag;
 	
 	private int w = 150, h = 590;
@@ -99,8 +99,8 @@ public class Tools extends JFrame {
 		case RECTANGLE:
 			rdbtnRectangle.setSelected(select);
 			break;
-		case SELECT:
-			rdbtnSelect.setSelected(select);
+		case TEXT:
+			rdbtnText.setSelected(select);
 			break;
 		case TRIANGLE:
 			rdbtnTriangle.setSelected(select);
@@ -226,16 +226,16 @@ public class Tools extends JFrame {
 		rdbtnEraser.setBounds(6, 186, 141, 23);
 		contentPane.add(rdbtnEraser);
 		
-		rdbtnSelect = new JRadioButton("Select (S)");
-		rdbtnSelect.addActionListener(new ActionListener() {
+		rdbtnText = new JRadioButton("Text (P)");
+		rdbtnText.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				tool = ToolType.SELECT;
+				tool = ToolType.TEXT;
 				board.changeTool(tool, chckbxFillShape.isSelected());
 			}
 		});
-		rdbtnSelect.setFocusPainted(false);
-		rdbtnSelect.setBounds(6, 216, 141, 23);
-		contentPane.add(rdbtnSelect);
+		rdbtnText.setFocusPainted(false);
+		rdbtnText.setBounds(6, 216, 141, 23);
+		contentPane.add(rdbtnText);
 		
 		rdbtnDrag = new JRadioButton("Drag (D)");
 		rdbtnDrag.addActionListener(new ActionListener() {
@@ -256,7 +256,7 @@ public class Tools extends JFrame {
 		group.add(rdbtnRectangle);
 		group.add(rdbtnTriangle);
 		group.add(rdbtnEraser);
-		group.add(rdbtnSelect);
+		group.add(rdbtnText);
 		group.add(rdbtnDrag);
 		
 		chckbxFillShape = new JCheckBox("Fill Shape (F)");
