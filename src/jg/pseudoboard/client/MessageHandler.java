@@ -9,7 +9,7 @@ public class MessageHandler {
 	
 	private Canvas canvas;
 	
-	private String server = "www.shelbington.com";
+	private String server = "SERVER.ADDRESS.HERE";
 	private int port;
 	
 	private boolean connected;
