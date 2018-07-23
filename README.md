@@ -12,12 +12,12 @@ Make sure to download pseudoboard_client, psuedoboard_server, and pseudoboard_co
 
 ### Code Modifications
 
-Client Files:
--MessageHandler.java -- modify the server string to the address you wish to use.
--Login.java -- modify the port int to whichever port you'd like to use (default is 21898).
+Client Files:  
+-MessageHandler.java -- modify the server string to the address you wish to use.  
+-Login.java -- modify the port int to whichever port you'd like to use (default is 21898).  
 
-Server Files:
+Server Files:  
 -BoardServer.java -- modify the DEFAULT_PORT int to whichever port you'd like to use (default is 21898).
 
-Common Files:
+Common Files:  
 -NONE
