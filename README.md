@@ -4,7 +4,8 @@ Pseudoboard (name not necessarily final) is a virtual and collaboarative whitebo
 
 ## Getting Started
 
-Follow instructions below to get program up and running.
+Follow instructions below to get program up and running.  
+(Main Client file: Login.java)
 
 ### Installing
 
